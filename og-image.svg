@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#667eea"/>
+      <stop offset="100%" stop-color="#764ba2"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="8" stdDeviation="12" flood-color="rgba(0,0,0,0.25)"/>
+    </filter>
+  </defs>
+  <rect x="0" y="0" width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- Card container -->
+  <g transform="translate(100,110)">
+    <rect width="1000" height="410" rx="24" fill="rgba(255,255,255,0.95)" filter="url(#shadow)"/>
+
+    <!-- Icon -->
+  <text x="30" y="165" font-size="120">🎓</text>
+
+    <!-- Title -->
+    <text x="180" y="150" font-family="Segoe UI, Roboto, Arial, sans-serif" font-size="56" font-weight="800" fill="#1f2937">
+      EstudiaSeguro
+    </text>
+
+    <!-- Subtitle -->
+    <text x="180" y="210" font-family="Segoe UI, Roboto, Arial, sans-serif" font-size="32" fill="#374151">
+      Guía de seguro de viaje para estudiantes (2025)
+    </text>
+
+    <!-- Bullets -->
+    <g font-family="Segoe UI, Roboto, Arial, sans-serif" font-size="26" fill="#4b5563">
+      <text x="180" y="270">• Coberturas esenciales y comparativas</text>
+      <text x="180" y="310">• Consejos claros para elegir mejor</text>
+      <text x="180" y="350">• Preguntas frecuentes explicadas</text>
+    </g>
+
+    <!-- Badge -->
+    <g transform="translate(770,80)">
+      <rect width="170" height="48" rx="12" fill="#2563eb"/>
+      <text x="85" y="32" text-anchor="middle" font-family="Segoe UI, Roboto, Arial, sans-serif" font-size="22" font-weight="700" fill="#ffffff">Guía 2025</text>
+    </g>
+  </g>
+
+  <!-- Footer URL -->
+  <text x="600" y="580" text-anchor="middle" font-family="Segoe UI, Roboto, Arial, sans-serif" font-size="24" fill="#ffffff" opacity="0.95">
+    mejorseguroestudiantes.com
+  </text>
+</svg>

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EstudiaSeguro — Exportar SVG a PNG</title>
+  <style>
+    :root { --bg:#0f172a; --panel:#111827; --card:#1f2937; --txt:#e5e7eb; --muted:#94a3b8; --primary:#2563eb; }
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; background:linear-gradient(135deg,#0f172a,#111827); color:var(--txt); }
+    .wrap { max-width: 880px; margin: 40px auto; padding: 0 20px; }
+    header { margin-bottom: 24px; }
+    h1 { font-size: 28px; margin: 0 0 6px; }
+    p { margin: 0 0 16px; color: var(--muted); }
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 16px; }
+    .card { background: var(--card); border-radius: 12px; padding: 16px; box-shadow: 0 10px 30px rgba(0,0,0,.25); }
+    .card h2 { margin: 0 0 8px; font-size: 18px; }
+    .row { display:flex; gap:8px; flex-wrap: wrap; margin-top: 10px; }
+    button { background: var(--primary); color: white; border:0; padding: 10px 14px; border-radius: 10px; cursor: pointer; font-weight: 600; }
+    button.secondary { background: #374151; }
+    .preview { margin-top: 12px; display: grid; gap: 8px; }
+    canvas { background: #0b1220; border: 1px solid #243045; border-radius: 8px; width: 100%; height: auto; }
+    small { color: var(--muted); }
+    footer { margin-top: 28px; color: var(--muted); font-size: 13px; }
+    .ok { color: #10b981; font-weight: 700; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <h1>Exportar SVG a PNG</h1>
+      <p>Convierte los archivos SVG del proyecto a PNG con un clic. Se descargan localmente (ideal para favicon y Open Graph).</p>
+    </header>
+
+    <div class="cards">
+      <section class="card" id="card-favicon">
+        <h2>Favicon</h2>
+        <p>Origen: <code>favicon.svg</code></p>
+        <div class="row">
+          <button data-export="favicon-16" class="secondary">Exportar 16×16</button>
+          <button data-export="favicon-32" class="secondary">Exportar 32×32</button>
+          <button data-export="favicon-180" class="secondary">Exportar 180×180</button>
+          <button data-export="favicon-256">Exportar 256×256</button>
+        </div>
+        <div class="preview">
+          <small>Vista previa (256×256)</small>
+          <canvas id="preview-favicon" width="256" height="256"></canvas>
+        </div>
+      </section>
+
+      <section class="card" id="card-og">
+        <h2>Imagen Social (Open Graph)</h2>
+        <p>Origen: <code>og-image.svg</code></p>
+        <div class="row">
+          <button data-export="og-1200">Exportar 1200×630</button>
+          <button data-export="og-600" class="secondary">Exportar 600×315</button>
+        </div>
+        <div class="preview">
+          <small>Vista previa (1200×630)</small>
+          <canvas id="preview-og" width="1200" height="630"></canvas>
+        </div>
+      </section>
+    </div>
+
+    <footer>
+      <p><span class="ok">Tip:</span> Tras exportar, actualiza las meta etiquetas a PNG si lo deseas (og:image, twitter:image, favicon). Algunos navegadores y redes cachean imágenes; añade <code>?v=1</code> al final para forzar actualización.</p>
+    </footer>
+  </div>
+
+  <script>
+    async function loadSVG(path) {
+      const res = await fetch(path, { cache: 'no-cache' });
+      const svgText = await res.text();
+      const blob = new Blob([svgText], { type: 'image/svg+xml' });
+      return URL.createObjectURL(blob);
+    }
+
+    function downloadCanvasPNG(canvas, filename) {
+      const link = document.createElement('a');
+      link.download = filename;
+      link.href = canvas.toDataURL('image/png');
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    }
+
+    async function drawToCanvas(svgUrl, canvas) {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => { const ctx = canvas.getContext('2d'); ctx.clearRect(0,0,canvas.width,canvas.height); ctx.drawImage(img, 0, 0, canvas.width, canvas.height); resolve(); };
+        img.onerror = reject;
+        img.src = svgUrl;
+      });
+    }
+
+    (async function init() {
+      // Favicon preview
+      const favSvg = await loadSVG('favicon.svg');
+      const favCanvas = document.getElementById('preview-favicon');
+      await drawToCanvas(favSvg, favCanvas);
+
+      // OG preview
+      const ogSvg = await loadSVG('og-image.svg');
+      const ogCanvas = document.getElementById('preview-og');
+      await drawToCanvas(ogSvg, ogCanvas);
+
+      // Buttons
+      document.querySelectorAll('button[data-export]').forEach(btn => {
+        btn.addEventListener('click', async () => {
+          const type = btn.getAttribute('data-export');
+          if (type.startsWith('favicon')) {
+            const size = parseInt(type.split('-')[1], 10);
+            const c = document.createElement('canvas');
+            c.width = c.height = size;
+            await drawToCanvas(favSvg, c);
+            downloadCanvasPNG(c, `favicon-${size}.png`);
+          } else if (type.startsWith('og')) {
+            const width = parseInt(type.split('-')[1], 10);
+            const height = Math.round(width * 0.525); // 1200x630 => 0.525
+            const c = document.createElement('canvas');
+            c.width = width; c.height = height;
+            await drawToCanvas(ogSvg, c);
+            downloadCanvasPNG(c, `og-image-${width}x${height}.png`);
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
